@@ -130,10 +130,4 @@ LOGIN_URL = 'users:login'
 LOGOUT_URL = 'users:logout'
 LOGOUT_REDIRECT_URL = 'users:login'
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.yourprovider.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'prasanna'
-EMAIL_HOST_PASSWORD = 'zoya pqwr tvgt wken'
-DEFAULT_FROM_EMAIL = 'kotkarprasanna96@gmail.com'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
