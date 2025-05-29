@@ -1,0 +1,49 @@
+{% extends "users/base.html" %}
+{% block title %}My Profile – SocialApp{% endblock %}
+
+{% block content %}
+<div class="min-h-screen py-12 px-4 bg-gradient-to-br from-indigo-50 to-white">
+  <div class="max-w-2xl mx-auto bg-white border border-indigo-200 rounded-xl shadow-lg overflow-hidden">
+
+    <!-- Profile Header -->
+    <div class="flex flex-col items-center text-center px-6 py-12 bg-indigo-100">
+      {% if profile.photo %}
+        <img src="{{ profile.photo.url }}" alt="{{ user.username }}'s photo"
+             class="w-32 h-32 rounded-full object-cover border-4 border-indigo-500 shadow-lg mb-4 transition-transform duration-300 hover:scale-105">
+      {% else %}
+        <div class="w-32 h-32 bg-indigo-400 rounded-full flex items-center justify-center text-4xl font-bold text-white mb-4">
+          {{ user.first_name|default:user.username|slice:":1" }}
+        </div>
+      {% endif %}
+      
+      <h2 class="text-3xl font-extrabold text-indigo-700 tracking-wide">{{ user.get_full_name|default:user.username }}</h2>
+      <p class="text-indigo-600 mt-1 text-sm font-medium">{{ user.email }}</p>
+    </div>
+
+    <!-- Profile Information -->
+    <div class="px-10 py-8 space-y-6 bg-white">
+      <div class="flex justify-between border-b border-indigo-100 pb-3">
+        <span class="text-indigo-400 font-semibold uppercase tracking-wide">Username</span>
+        <span class="text-indigo-900 font-semibold">{{ user.username }}</span>
+      </div>
+      <div class="flex justify-between border-b border-indigo-100 pb-3">
+        <span class="text-indigo-400 font-semibold uppercase tracking-wide">First Name</span>
+        <span class="text-indigo-900 font-semibold">{{ user.first_name|default:"—" }}</span>
+      </div>
+      <div class="flex justify-between pb-3">
+        <span class="text-indigo-400 font-semibold uppercase tracking-wide">Last Name</span>
+        <span class="text-indigo-900 font-semibold">{{ user.last_name|default:"—" }}</span>
+      </div>
+    </div>
+
+    <!-- Edit Button -->
+    <div class="px-10 py-6 bg-indigo-50 text-center border-t border-indigo-200">
+      <a href="{% url 'users:edit' %}" 
+         class="inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-3 rounded-xl shadow-md transition transform hover:scale-105">
+        Edit Profile
+      </a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,160 @@
+{% extends "users/base.html" %}
+{% load static %}
+
+{% block title %}All Posts – SocialApp{% endblock title %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 py-10">
+  <h2 class="text-3xl font-bold text-indigo-700 mb-6 text-center">Explore Posts</h2>
+
+  {% if posts %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {% for post in posts %}
+        <div class="bg-white shadow-md rounded-xl overflow-hidden border border-gray-200">
+          {% if post.image %}
+            <img src="{{ post.image.url }}" alt="{{ post.title }}" class="w-full h-48 object-cover">
+          {% endif %}
+          <div class="p-4">
+
+            <!-- Author Info -->
+            <div class="flex items-center mb-3">
+              {% if post.user.profile.photo %}
+                <img src="{{ post.user.profile.photo.url }}"
+                     alt="{{ post.user.username }}’s avatar"
+                     class="w-8 h-8 rounded-full object-cover border-2 border-white shadow-sm mr-2">
+              {% else %}
+                <div class="w-8 h-8 bg-indigo-300 rounded-full flex items-center justify-center text-xs font-bold text-white mr-2">
+                  {{ post.user.first_name|default:post.user.username|slice:":1" }}
+                </div>
+              {% endif %}
+              <span class="text-gray-700 font-medium text-sm">
+                {{ post.user.get_full_name|default:post.user.username }}
+              </span>
+            </div>
+
+            <h3 class="text-xl font-semibold text-gray-800">{{ post.title }}</h3>
+            {% if post.caption %}
+              <p class="text-gray-600 mt-1 text-sm">{{ post.caption|truncatechars:100 }}</p>
+            {% endif %}
+            <p class="text-xs text-gray-400 mt-3">Posted on {{ post.date }}</p>
+
+            <p class="text-sm text-gray-600 mt-1">
+              ❤️ {{ post.liked_by.count }} {% if post.liked_by.count == 1 or post.liked_by.count == 0 %}like{% else %}likes{% endif %}
+            </p>
+
+            <!-- Like, Comment, Share -->
+            <div class="mt-4 flex items-center justify-between px-1">
+              <a href="#" data-post-id="{{ post.id }}"
+                 class="bt-like transition {{ post.is_liked|yesno:'text-red-500,text-gray-500' }}"
+                 title="Like">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                     class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5
+                          2 6.5 3.5 5 5.5 5c1.54 0 3.04.99 3.57 2.36h1.87
+                          C13.46 5.99 14.96 5 16.5 5
+                          18.5 5 20 6.5 20 8.5c0 3.78-3.4 6.86-8.55 11.54
+                          L12 21.35z"/>
+                </svg>
+              </a>
+
+              <!-- Comment button triggers toggle -->
+              <a href="#" 
+                 class="text-gray-500 hover:text-indigo-600 transition btn-toggle-comments" 
+                 title="Comment" 
+                 data-post-id="{{ post.id }}">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                     class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M8 10h.01M12 10h.01M16 10h.01
+                           M21 12c0 4.418-4.03 8-9 8
+                           a9.83 9.83 0 01-4.255-.938
+                           L3 20l1.062-4.516
+                           A7.97 7.97 0 013 12
+                           c0-4.418 4.03-8 9-8
+                           s9 3.582 9 8z"/>
+                </svg>
+              </a>
+            </div>
+
+          </div>
+
+          <!-- COMMENT SECTION - Hidden by default -->
+          <div id="comments-section-{{ post.id }}" class="px-5 py-5 hidden border-t border-gray-200 bg-gray-50 rounded-b-lg">
+            <div class="mb-4 max-h-40 overflow-y-auto space-y-3">
+              {% for comment in post.comments.all %}
+                <div class="p-3 bg-white rounded-lg shadow-sm border border-gray-200">
+                  <div class="flex items-center justify-between mb-1">
+                    <b class="text-indigo-600">{{ comment.posted_by }}</b>
+                    <span class="text-xs text-gray-400 italic">{{ comment.created|date:"M d, Y H:i" }}</span>
+                  </div>
+                  <p class="text-gray-700">{{ comment.body }}</p>
+                </div>
+              {% empty %}
+                <p class="text-gray-500 text-sm italic">No comments yet.</p>
+              {% endfor %}
+            </div>
+            <form method="post" class="bg-white rounded p-3 shadow-sm border border-gray-200">
+                {% csrf_token %}
+                <div class="flex space-x-3">
+                  <textarea name="body" id="id_body" rows="2" required
+                    class="flex-grow border border-gray-300 rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"></textarea>
+                  <input type="hidden" name="post_id" id="post_id" value="{{ post.id }}">
+                  <input type="hidden" name="posted_by" id="posted_by" value="{{ logged_user }}">
+                  <button type="submit" class="bg-green-500 text-white px-5 py-2 rounded hover:bg-green-600 transition">Add</button>
+                </div>
+            </form>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="text-center text-gray-600 mt-12">
+      <p class="text-lg">No posts available yet.</p>
+    </div>
+  {% endif %}
+</div>
+
+<!-- jQuery and AJAX for liking -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+  const csrftoken = document.cookie
+    .split('; ')
+    .find(row => row.startsWith('csrftoken='))
+    .split('=')[1];
+
+  // Like button AJAX
+  $(document).on('click', '.bt-like', function(e) {
+    e.preventDefault();
+    const $btn = $(this);
+    const postId = $btn.data('post-id');
+
+    $.ajax({
+      type: "POST",
+      url: "{% url 'posts:like' %}",
+      data: {
+        post_id: postId,
+      },
+      headers: { "X-CSRFToken": csrftoken },
+      success: function(data) {
+        if (data.liked) {
+          $btn.removeClass('text-gray-500').addClass('text-red-500');
+        } else {
+          $btn.removeClass('text-red-500').addClass('text-gray-500');
+        }
+      }
+    });
+    window.location.href = "/"
+  });
+
+  // Toggle comments visibility on comment icon click
+  $(document).on('click', '.btn-toggle-comments', function(e) {
+    e.preventDefault();
+    const postId = $(this).data('post-id');
+    const commentSection = $('#comments-section-' + postId);
+
+    commentSection.toggleClass('hidden');
+  });
+</script>
+
+{% endblock %}

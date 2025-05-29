@@ -1,0 +1,59 @@
+{% extends "users/base.html" %}
+{% block title %}Create Post – SocialApp{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex justify-center items-start pt-12 px-4 bg-gray-50">
+  <div class="w-full max-w-md bg-white rounded-xl shadow-lg border border-gray-200 p-8">
+
+    <h2 class="text-2xl font-bold text-indigo-600 mb-6 text-center">Create New Post</h2>
+
+    <form method="post" enctype="multipart/form-data" class="space-y-5">
+      {% csrf_token %}
+      
+      {{ form.non_field_errors }}
+      
+      <!-- Title -->
+      <div>
+        <label for="{{ form.title.id_for_label }}" class="block mb-1 text-gray-700 font-semibold">Title</label>
+        <input type="text" name="{{ form.title.name }}" id="{{ form.title.id_for_label }}"
+               value="{{ form.title.value|default_if_none:'' }}"
+               class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-400 focus:outline-none shadow-sm"
+               required>
+        {% for error in form.title.errors %}
+          <p class="text-red-600 text-sm mt-1">{{ error }}</p>
+        {% endfor %}
+      </div>
+
+      <!-- Caption -->
+      <div>
+        <label for="{{ form.caption.id_for_label }}" class="block mb-1 text-gray-700 font-semibold">Caption</label>
+        <textarea name="{{ form.caption.name }}" id="{{ form.caption.id_for_label }}" rows="4"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-400 focus:outline-none shadow-sm resize-none"
+                  placeholder="Write something...">{{ form.caption.value|default_if_none:'' }}</textarea>
+        {% for error in form.caption.errors %}
+          <p class="text-red-600 text-sm mt-1">{{ error }}</p>
+        {% endfor %}
+      </div>
+
+      <!-- Image -->
+      <div>
+        <label for="{{ form.image.id_for_label }}" class="block mb-1 text-gray-700 font-semibold">Image</label>
+        <input type="file" name="{{ form.image.name }}" id="{{ form.image.id_for_label }}"
+               class="w-full text-gray-600"
+               accept="image/*"
+               required>
+        {% for error in form.image.errors %}
+          <p class="text-red-600 text-sm mt-1">{{ error }}</p>
+        {% endfor %}
+      </div>
+
+      <!-- Submit Button -->
+      <button type="submit"
+              class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-lg font-semibold transition-shadow shadow-md">
+        Create Post
+      </button>
+    </form>
+
+  </div>
+</div>
+{% endblock %}

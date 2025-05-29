@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Check out this post!</title>
+    <style>
+      body { font-family: Arial, sans-serif; color: #333; }
+      .header { background: #4f46e5; color: #fff; padding: 20px; text-align: center; }
+      .content { padding: 20px; }
+      .title { font-size: 24px; margin-bottom: 10px; }
+      .caption { margin-bottom: 20px; }
+      .image { max-width: 100%; height: auto; border-radius: 8px; }
+      .link { display: inline-block; margin-top: 20px; background: #4f46e5; color: #fff;
+              text-decoration: none; padding: 10px 20px; border-radius: 4px; }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h1>{{ post.title }}</h1>
+    </div>
+    <div class="content">
+      {% if post.image %}
+        <img class="image" src="{{ post.image.url }}" alt="{{ post.title }}" />
+      {% endif %}
+      <p class="caption">{{ post.caption }}</p>
+      <p><strong>By:</strong> {{ post.user.get_full_name|default:post.user.username }}</p>
+      <a href="{{ post_url }}" class="link">View Post on SocialApp</a>
+    </div>
+  </body>
+</html>
